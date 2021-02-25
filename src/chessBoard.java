@@ -1,10 +1,32 @@
+import jdk.jfr.Timestamp;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collections;
 import java.util.stream.*;
+import java.time.*;
 
 public class chessBoard {
+
+    //////////////////////////////////////////////////////////////
+    // https://gist.github.com/AlbertoImpl/3fbf55d5310e0b185e9a //
+    //////////////////////////////////////////////////////////////
+    @FunctionalInterface
+    public interface Trampoline<V> {
+
+        V trampoline();
+
+        default V call() {
+            Object trampoline = this;
+            while (trampoline instanceof Trampoline) {
+                trampoline = ((Trampoline) trampoline).trampoline();
+            }
+            V value = (V) trampoline;
+            return value;
+        }
+    }
+    ///////////////////////////////////////////////////////////////
 
     // Board is a bitset, where 0 is empty square 1 is queen
 
@@ -15,7 +37,7 @@ public class chessBoard {
     private BitSet[] masks;
     private int n;
     private int solutions;
-    Node<Integer> root;
+    private Node<Integer> root;
 
     public chessBoard(int n) {
         this.n = n;
@@ -28,56 +50,59 @@ public class chessBoard {
         root.depth = -1;
 
         generateMasks();
-
-        genTree(root);
     }
 
-    private void genTree(Node<Integer> node) {
-        // todo take into consideration moves when generating valid moves
+    public void begin() {
+        genTree(root).call();
+    }
 
-        BitSet validMoves = validMoves();
-        int nextMove = nextMove(node);
+    private Trampoline genTree(Node<Integer> node) {
+        return () -> {
+            if(node.depth == n - 1) {
+                solutions++;
+                //printBoard(board);
+                //System.out.println(solutions);
+                //System.out.println();
+            };
 
-        // maxmove = clamp next move to current row
-        int maxMove = (node.depth + 1) * n + n;
-        maxMove = maxMove > n*n ? n*n : maxMove;
+            //System.out.println(String.format("depth %d, data %d, children %s", node.depth, node.data, node.children));
+            BitSet validMoves = validMoves();
+            int nextMove = nextMove(node);
 
-        if(node.depth == n - 1) {
-            solutions++;
-            //printBoard();
-            //System.out.println();
-        };
+            // maxmove = clamp next move to current row
+            int maxMove = (node.depth + 1) * n + n;
+            maxMove = maxMove > n*n ? n*n : maxMove;
 
-        // when next move possible -->
-        if(nextMove < maxMove && nextMove < n*n) {
-            board.set(nextMove);
-            validMoves.set(nextMove);
+            // when next move possible -->
+            if(nextMove < maxMove && nextMove < n*n) {
+                board.set(nextMove);
+                validMoves.set(nextMove);
 
-            //  --- next node
-            Node<Integer> nextNode = new Node<>(nextMove % n);
-            if(node.moves == null) node.moves = validMoves.get(maxMove - n, maxMove);
+                //  --- next node
+                Node<Integer> nextNode = new Node<>(nextMove % n);
+                if(node.moves == null) node.moves = validMoves.get(maxMove - n, maxMove);
+                node.addChild(nextNode);
+                // ---
 
-            node.addChild(nextNode);
-            // --- end
+                return genTree(nextNode);
 
-            genTree(nextNode);
+            } else {
+                // backtracking
 
-        // backtrack
-        } else {
-            if(node == root && node.moves.cardinality() == n) {
-                System.out.println("couldnt find more");
-                System.out.println("solutions: " + solutions);
-                return;
+                // if no more positions to check
+                if(node == root && node.moves.cardinality() == n) {
+                    System.out.println("Completed, solutions: " + solutions);
+                    return solutions;
+                }
+                // unset board piece in current row & current position explored
+                board.set(node.data + n * node.depth, false);
+                node.parent.moves.set(node.data, true);
+                node.children = null;
+                //node.parent.removeChild(node);
+
+                return genTree(node.parent);
             }
-            board.set(node.data + n * node.depth, false);
-            // mark current move as explored
-            node.parent.moves.set(node.data, true);
-            genTree(node.parent);
-        }
-    }
-
-    public void printBoard() {
-        printBoard(board);
+        };
     }
 
     private void printBoard(BitSet board) {
@@ -149,15 +174,13 @@ public class chessBoard {
             masks[i] = mask;
         }
     }
+
     private BitSet validMoves() {
-        BitSet mask = new BitSet(n*n);
-        mask.or(board);
+        BitSet mask = (BitSet)board.clone();
 
-        // create copy of mask (cant mutate while using the stream) -> stream -> apply mask for every element
-        //mask.get(0, mask.size()).stream().forEach(el -> mask.or(masks[el]));
-
-        for(int i = 0; i < board.length(); i++) {
-            if(board.get(i)) mask.or(masks[i]);
+        // better performace from just iterating
+        for (int i = board.nextSetBit(0); i != -1; i = board.nextSetBit(i + 1)) {
+            mask.or(masks[i]);
         }
         return mask;
     }
@@ -179,6 +202,12 @@ public class chessBoard {
     }
 
     public static void main(String[] args) {
-        chessBoard board = new chessBoard(9);
+        chessBoard board = new chessBoard(16);
+
+        long t1 = System.nanoTime();
+        board.begin();
+        long t2 = System.nanoTime();
+
+        System.out.println((t2-t1)/1_000_000_000 + "ms");
     }
 }

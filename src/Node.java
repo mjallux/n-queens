@@ -21,9 +21,6 @@ public class Node<T> {
         children.add(child);
     }
 
-    public int getNextMove() {
-        return moves.nextClearBit(0);
-    }
 
     public void removeChild(Node<T> child) {
         this.children.remove(child);
