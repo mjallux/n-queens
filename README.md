@@ -12,9 +12,9 @@ Dijkstran algoritmi toimii seuraavasti:
 
 1. Etsi seuraava ruutu, johon voi asettaa kuningatar.
 
-2. Jos kuningattaria on laudalla N kappaletta, lisää tuloksiin 1. Tulokset ovat mahdollisia shakkilaudan konfiguraatioita jossa on N kuningatarta.
+2. Jos kuningattaria on laudalla N kappaletta, lisää tuloksiin 1. Tulokset ovat mahdollisia shakkilaudan asetelmia joissa on N kuningatarta.
 
-3. Jos seuraava kuningatarta ei voi asettaa laudalle ja kuningattaria on laudalla vähemmän kuin N määrä, peruuta siirtoja kunnes voit asettaa kuningattaren taas laudalle käyttämättä jo tutkittuja laudan konfiguraatioita.
+3. Jos seuraavaa kuningatarta ei voi asettaa laudalle ja kuningattaria on laudalla vähemmän kuin N, peruuta siirtoja kunnes voit asettaa kuningattaren taas laudalle käyttämättä jo tutkittuja laudan asetelmia.
 
 4. Toista kunnes kuningattaria ei voi asettaa laudalle enään lainkaan.
 
@@ -33,7 +33,7 @@ Kuningattaret: K-ary tree
 
 Lautaa käytetään ainoastaan seuraavien mahdollisten siirtojen laskemiseen.
 
-Lisäksi ohjelman alussa generoidaan N\*N määrä N\*N pituisia taulukoita, joiden avulla lasketaan bittioperaatioilla seuraava mahdollinen siirto. 
+Lisäksi ohjelman alussa generoidaan N\*N määrä N\*N kokoisia taulukoita, joiden avulla lasketaan bittioperaatioilla seuraava mahdollinen siirto. 
 
 Bittioperaatioilla eliminoidaan ylimääräinenn iterointi jokaista laudan kuningatarta kohti.
 
