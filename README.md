@@ -23,13 +23,10 @@ Dijkstran algoritmi toimii seuraavasti:
 # 2. Toteutus
 
 ### Datastruktuurit
----
 
 Lauta: N*N BitSet
 
 Kuningattaret: K-ary tree
-
-<br>
 
 Lautaa käytetään ainoastaan seuraavien mahdollisten siirtojen laskemiseen.
 
@@ -71,7 +68,6 @@ Kirjoitan pseudokoodilla perustoimintaperiaatteen.
 
 Siirtomaskien generointi
 
----
 
 ```
 BitSet[] generateMasks():
@@ -88,11 +84,9 @@ BitSet[] generateMasks():
 
     return masks
 ```
----
 
 Rekursiivinen backtrack algoritmi
 
----
 
 ```
 dijkstra(rootNode) ->
@@ -130,8 +124,8 @@ void dijkstra(node):
 
 ### Parannettavaa:
 - Monisäikeistys, tällä hetkellä ohjelma on vain yksisäikeinen.
-- Java toteutuksessani on paljon ohjelmahaaroja, jotka voisi todennäköisesti simplifoida.
+- Java toteutuksessani on paljon ohjelmahaaroja, jotka voisi todennäköisesti saada pois.
 - Branchless programming?
-- Testaa BitSet vs bool[] nopeus
+- Testaa BitSet vs bool[] nopeus? boolean[8][8] veisi 512 bittiä muistia, kun taas BitSet(N*N) vie tasan 64 bittiä. Operaatiot saattavat olla nopeampia booleanille?
 - Piirrä hienompi shakkilauta
 - Piirrä kuva puusta, helppo visualisoida. Kaikki puun uloimmat haarat/lehdet ovat N kuningattaren ratkaisuja.
