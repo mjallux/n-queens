@@ -1,13 +1,7 @@
-import jdk.jfr.Timestamp;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.BitSet;
-import java.util.Collections;
 import java.util.stream.*;
-import java.time.*;
 
-public class chessBoard {
+public class ChessBoard {
 
     //////////////////////////////////////////////////////////////
     // https://gist.github.com/AlbertoImpl/3fbf55d5310e0b185e9a //
@@ -39,7 +33,7 @@ public class chessBoard {
     private int solutions;
     private Node<Integer> root;
 
-    public chessBoard(int n) {
+    public ChessBoard(int n) {
         this.n = n;
 
         board = new BitSet(n*n);
@@ -57,13 +51,14 @@ public class chessBoard {
     }
 
     private Trampoline genTree(Node<Integer> node) {
+        // use trampoline data structure to return stack frame early (otherwise stackoverflowerror)
+
         return () -> {
-            if(node.depth == n - 1) {
+            if(board.cardinality() == n) {
                 solutions++;
-                //printBoard(board);
-                //System.out.println(solutions);
-                //System.out.println();
-            };
+                printBoard(board);
+                System.out.println();
+            }
 
             //System.out.println(String.format("depth %d, data %d, children %s", node.depth, node.data, node.children));
             BitSet validMoves = validMoves();
@@ -80,6 +75,7 @@ public class chessBoard {
 
                 //  --- next node
                 Node<Integer> nextNode = new Node<>(nextMove % n);
+
                 if(node.moves == null) node.moves = validMoves.get(maxMove - n, maxMove);
                 node.addChild(nextNode);
                 // ---
@@ -94,11 +90,11 @@ public class chessBoard {
                     System.out.println("Completed, solutions: " + solutions);
                     return solutions;
                 }
+
                 // unset board piece in current row & current position explored
                 board.set(node.data + n * node.depth, false);
                 node.parent.moves.set(node.data, true);
                 node.children = null;
-                //node.parent.removeChild(node);
 
                 return genTree(node.parent);
             }
@@ -188,7 +184,7 @@ public class chessBoard {
     private int nextMove(Node<Integer> node){
         int next;
         if(node.moves != null) {
-            // translate to 1d move e.g. [3][1] --> [6] i = x + width * y
+            // translate to 1d move [x][y] --> BitSet[i], i = x + width * y
             if(node.moves.nextClearBit(0) == n) {
                 return n*n;
             }
@@ -202,7 +198,7 @@ public class chessBoard {
     }
 
     public static void main(String[] args) {
-        chessBoard board = new chessBoard(16);
+        ChessBoard board = new ChessBoard(16);
 
         long t1 = System.nanoTime();
         board.begin();

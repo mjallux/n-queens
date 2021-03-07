@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.BitSet;
 
+
 public class Node<T> {
     ArrayList<Node<T>> children;
     Node<T> parent;
@@ -15,16 +16,13 @@ public class Node<T> {
         this.children = new ArrayList<>();
     }
 
-    public void addChild(Node<T> child) {
+    void addChild(Node<T> child) {
         child.parent = this;
         child.depth = this.depth + 1;
         children.add(child);
     }
 
 
-    public void removeChild(Node<T> child) {
-        this.children.remove(child);
-    }
 
     public ArrayList<Node<T>> getChildren() {
         return children;
