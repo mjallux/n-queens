@@ -92,7 +92,7 @@ Rekursiivinen backtrack algoritmi
 dijkstra(rootNode) ->
 
 
-void dijkstra(node):
+dijkstra(node):
     if(board.queens === N):
         solutions++
 
